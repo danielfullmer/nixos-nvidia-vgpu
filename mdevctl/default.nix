@@ -10,6 +10,8 @@ stdenv.mkDerivation rec {
     rev = version;
     sha256 = "0crrsixs0pc3kj7gmg8p5kaxjp35dlal7pwal0h7wddpc0nsq3ql";
   };
+  
+  buildInputs = [ jq ];
 
   postPatch = ''
     substituteInPlace 60-mdevctl.rules \
