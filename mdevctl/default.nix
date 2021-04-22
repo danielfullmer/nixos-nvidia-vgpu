@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, bash }:
+{ lib, stdenv, fetchFromGitHub, bash, jq }:
 
 stdenv.mkDerivation rec {
   name = "mdevctl";
