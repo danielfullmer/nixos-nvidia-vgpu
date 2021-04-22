@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, bash }:
+{ lib, stdenv, fetchFromGitHub, makeWrapper, bash, getopt, jq }:
 
 stdenv.mkDerivation rec {
   name = "mdevctl";
@@ -11,6 +11,8 @@ stdenv.mkDerivation rec {
     sha256 = "0crrsixs0pc3kj7gmg8p5kaxjp35dlal7pwal0h7wddpc0nsq3ql";
   };
 
+  nativeBuildInputs = [ makeWrapper ];
+
   postPatch = ''
     substituteInPlace 60-mdevctl.rules \
       --replace /usr/sbin/ $out/ \
@@ -22,6 +24,8 @@ stdenv.mkDerivation rec {
     install -Dm644 60-mdevctl.rules $out/lib/udev/rules.d/60-mdevctl.rules
     install -Dm644 mdevctl.8 $out/share/man8/mdevctl.8
     ln -s $out/share/man8/mdevctl.8 $out/share/man8/lsmdev.8
+
+    wrapProgram $out/bin/mdevctl  --prefix PATH : ${lib.makeBinPath [ getopt jq ]}
   '';
 
   meta = with lib; {
