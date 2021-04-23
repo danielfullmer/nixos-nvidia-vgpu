@@ -25,13 +25,13 @@ let
 
   vgpu_unlock = pkgs.stdenv.mkDerivation {
     name = "nvidia-vgpu-unlock";
-    version = "unstable-2021-04-17";
+    version = "unstable-2021-04-22";
 
     src = pkgs.fetchFromGitHub {
       owner = "DualCoder";
       repo = "vgpu_unlock";
-      rev = "825e5686ac33022cf546dcb5a7e1618884317049";
-      sha256 = "0n0sna6n79jbrm2sr78d34137yh8ksh5k0pmv1h8iz8vsfq2pw8i";
+      rev = "1888236c75d8eac673695be8b000f0b065111c51";
+      sha256 = "0s8bmscb8irj1sggfg1fhacqd1lh59l326bnrk4a2g4qngsbkix3";
     };
 
     buildInputs = [ (pkgs.python3.withPackages (p: [ frida ])) ];
