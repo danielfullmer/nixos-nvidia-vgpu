@@ -13,8 +13,13 @@ Example usage:
 ```
 This currently creates a merged driver from the KVM + GRID drivers for using native desktop + VM guest simultaneously.
 The merging stuff should probably be optional.
-This module currently only works on recent NixOS unstable which has the `hardware.nvidia.package` option.
 
+## Requirements
+This module currently only works on with a recent NixOS unstable which has the `hardware.nvidia.package` option (Added in January 2021).
+Additionally, the NVIDIA drivers used do not compile with newer kernels (I think `>= 5.10`).
+This module has been tested using the `5.4` Linux kernel.
+
+## Additional Notes
 See also: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/configuring_and_managing_virtualization/assembly_managing-nvidia-vgpu-devices_configuring-and-managing-virtualization
 
 I've tested creating an mdev on my own 1080 Ti by running:
