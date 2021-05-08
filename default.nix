@@ -6,14 +6,18 @@ let
   mdevctl = pkgs.callPackage ./mdevctl {};
   frida = pkgs.python3Packages.callPackage ./frida {};
 
+  vgpuVersion = "460.32.04";
+  gridVersion = "460.32.03";
+  guestVersion = "461.33";
+
   nvidia-drivers-zips = pkgs.fetchzip {
-    url = "https://storage.googleapis.com/nvidiaowo/NVIDIA-GRID-Linux-KVM-460.32.04-460.32.03-461.33.zip";
+    url = "https://storage.googleapis.com/nvidiaowo/NVIDIA-GRID-Linux-KVM-${vgpuVersion}-${gridVersion}-${guestVersion}.zip";
     sha256 = "1d2ji2h9rhjci1q9cdbzwir3j68mv5svj1gfbhsf4kvbqhqyvspw";
     stripRoot = false;
   };
 
-  nvidia-vgpu-kvm-src = pkgs.runCommand "nvidia-460.32.04-vgpu-kvm-src" {
-    src = "${nvidia-drivers-zips}/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm.run";
+  nvidia-vgpu-kvm-src = pkgs.runCommand "nvidia-${vgpuVersion}-vgpu-kvm-src" {
+    src = "${nvidia-drivers-zips}/NVIDIA-Linux-x86_64-${vgpuVersion}-vgpu-kvm.run";
   } ''
     mkdir $out
     cd $out
@@ -60,7 +64,10 @@ in
   config = lib.mkIf cfg.enable {
     hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable.overrideAttrs (
       { patches ? [], postUnpack ? "", postPatch ? "", preFixup ? "", ... }@attrs: {
-      src = "${nvidia-drivers-zips}/NVIDIA-Linux-x86_64-460.32.03-grid.run";
+      name = "nvidia-x11-${vgpuVersion}-${gridVersion}-${config.boot.kernelPackages.kernel.version}";
+      version = "${vgpuVersion}";
+
+      src = "${nvidia-drivers-zips}/NVIDIA-Linux-x86_64-${gridVersion}-grid.run";
 
       patches = patches ++ [
         ./nvidia-vgpu-merge.patch
@@ -78,7 +85,7 @@ in
         echo "NVIDIA_SOURCES += nvidia/nv-vgpu-vfio-interface.c" >> kernel/nvidia/nvidia-sources.Kbuild
         cp -r ${nvidia-vgpu-kvm-src}/kernel/nvidia-vgpu-vfio kernel/nvidia-vgpu-vfio
 
-        for i in libnvidia-vgpu.so.460.32.04 libnvidia-vgxcfg.so.460.32.04 nvidia-vgpu-mgr nvidia-vgpud vgpuConfig.xml sriov-manage; do
+        for i in libnvidia-vgpu.so.${vgpuVersion} libnvidia-vgxcfg.so.${vgpuVersion} nvidia-vgpu-mgr nvidia-vgpud vgpuConfig.xml sriov-manage; do
           cp ${nvidia-vgpu-kvm-src}/$i $i
         done
 
@@ -96,10 +103,10 @@ in
 
       # HACK: Using preFixup instead of postInstall since nvidia-x11 builder.sh doesn't support hooks
       preFixup = preFixup + ''
-        for i in libnvidia-vgpu.so.460.32.04 libnvidia-vgxcfg.so.460.32.04; do
+        for i in libnvidia-vgpu.so.${vgpuVersion} libnvidia-vgxcfg.so.${vgpuVersion}; do
           install -Dm755 "$i" "$out/lib/$i"
         done
-        patchelf --set-rpath ${pkgs.stdenv.cc.cc.lib}/lib $out/lib/libnvidia-vgpu.so.460.32.04
+        patchelf --set-rpath ${pkgs.stdenv.cc.cc.lib}/lib $out/lib/libnvidia-vgpu.so.${vgpuVersion}
         install -Dm644 vgpuConfig.xml $out/vgpuConfig.xml
 
         for i in nvidia-vgpud nvidia-vgpu-mgr; do
