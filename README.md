@@ -15,7 +15,7 @@ This currently creates a merged driver from the KVM + GRID drivers for using nat
 The merging stuff should probably be optional.
 
 ## Requirements
-This module currently only works on with a recent NixOS unstable which has the `hardware.nvidia.package` option (Added in January 2021).
+This module currently only works with a NixOS `>= 21.05` which has the `hardware.nvidia.package` option (Added in January 2021).
 Additionally, the NVIDIA drivers used do not compile with newer kernels (I think `>= 5.10`).
 This module has been tested using the `5.4` Linux kernel.
 
