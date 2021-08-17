@@ -4,7 +4,8 @@ let
   cfg = config.hardware.nvidia.vgpu;
 
   mdevctl = pkgs.callPackage ./mdevctl {};
-  frida = pkgs.python3Packages.callPackage ./frida {};
+  pythonPackages = pkgs.python38Packages;
+  frida = pythonPackages.callPackage ./frida {};
 
   vgpuVersion = "460.32.04";
   gridVersion = "460.32.03";
@@ -38,7 +39,7 @@ let
       sha256 = "0s8bmscb8irj1sggfg1fhacqd1lh59l326bnrk4a2g4qngsbkix3";
     };
 
-    buildInputs = [ (pkgs.python3.withPackages (p: [ frida ])) ];
+    buildInputs = [ (pythonPackages.python.withPackages (p: [ frida ])) ];
 
     postPatch = ''
       substituteInPlace vgpu_unlock \
