@@ -11,14 +11,26 @@ let
   gridVersion = "460.32.03";
   guestVersion = "461.33";
 
-  nvidia-drivers-zips = pkgs.fetchzip {
-    url = "https://storage.googleapis.com/nvidiaowo/NVIDIA-GRID-Linux-KVM-${vgpuVersion}-${gridVersion}-${guestVersion}.zip";
-    sha256 = "1d2ji2h9rhjci1q9cdbzwir3j68mv5svj1gfbhsf4kvbqhqyvspw";
-    stripRoot = false;
-  };
+  combinedZipName = "NVIDIA-GRID-Linux-KVM-${vgpuVersion}-${gridVersion}-${guestVersion}.zip";
+  requireFile = { name, ... }@args: pkgs.requireFile (rec {
+    inherit name;
+    url = "https://www.nvidia.com/object/vGPU-software-driver.html";
+    message = ''
+      Unfortunately, we cannot download file ${name} automatically.
+      This file can be extracted from ${combinedZipName}.
+      Please go to ${url} to download it yourself, and add it to the Nix store
+      using either
+        nix-store --add-fixed sha256 ${name}
+      or
+        nix-prefetch-url --type sha256 file:///path/to/${name}
+    '';
+  } // args);
 
   nvidia-vgpu-kvm-src = pkgs.runCommand "nvidia-${vgpuVersion}-vgpu-kvm-src" {
-    src = "${nvidia-drivers-zips}/NVIDIA-Linux-x86_64-${vgpuVersion}-vgpu-kvm.run";
+    src = requireFile {
+      name = "NVIDIA-Linux-x86_64-${vgpuVersion}-vgpu-kvm.run";
+      sha256 = "00ay1f434dbls6p0kaawzc6ziwlp9dnkg114ipg9xx8xi4360zzl";
+    };
   } ''
     mkdir $out
     cd $out
@@ -68,7 +80,10 @@ in
       name = "nvidia-x11-${vgpuVersion}-${gridVersion}-${config.boot.kernelPackages.kernel.version}";
       version = "${vgpuVersion}";
 
-      src = "${nvidia-drivers-zips}/NVIDIA-Linux-x86_64-${gridVersion}-grid.run";
+      src = requireFile {
+        name = "NVIDIA-Linux-x86_64-${gridVersion}-grid.run";
+        sha256 = "0smvmxalxv7v12m0hvd5nx16jmcc7018s8kac3ycmxam8l0k9mw9";
+      };
 
       patches = patches ++ [
         ./nvidia-vgpu-merge.patch
