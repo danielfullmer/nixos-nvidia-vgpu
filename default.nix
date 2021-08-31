@@ -7,9 +7,9 @@ let
   pythonPackages = pkgs.python38Packages;
   frida = pythonPackages.callPackage ./frida {};
 
-  vgpuVersion = "460.32.04";
-  gridVersion = "460.32.03";
-  guestVersion = "461.33";
+  vgpuVersion = "470.63";
+  gridVersion = "470.63.01";
+  guestVersion = "471.68";
 
   combinedZipName = "NVIDIA-GRID-Linux-KVM-${vgpuVersion}-${gridVersion}-${guestVersion}.zip";
   requireFile = { name, ... }@args: pkgs.requireFile (rec {
@@ -29,7 +29,7 @@ let
   nvidia-vgpu-kvm-src = pkgs.runCommand "nvidia-${vgpuVersion}-vgpu-kvm-src" {
     src = requireFile {
       name = "NVIDIA-Linux-x86_64-${vgpuVersion}-vgpu-kvm.run";
-      sha256 = "00ay1f434dbls6p0kaawzc6ziwlp9dnkg114ipg9xx8xi4360zzl";
+      sha256 = "14qli3rx909fy4m6a3grbyjym70a2x910vivq7zzjvv7x4mjkbfj";
     };
   } ''
     mkdir $out
@@ -82,7 +82,7 @@ in
 
       src = requireFile {
         name = "NVIDIA-Linux-x86_64-${gridVersion}-grid.run";
-        sha256 = "0smvmxalxv7v12m0hvd5nx16jmcc7018s8kac3ycmxam8l0k9mw9";
+        sha256 = "0x15czcadnqm9fsbvjarx0ps759vx63xf1fb6r5nq8bpjrq5nxqi";
       };
 
       patches = patches ++ [
@@ -96,7 +96,7 @@ in
       postUnpack = postUnpack + ''
         # More merging, besides patch above
         cp -r ${nvidia-vgpu-kvm-src}/init-scripts .
-        cp ${nvidia-vgpu-kvm-src}/kernel/common/inc/nv-vgpu-vfio-interface.h kernel/common/inc//nv-vgpu-vfio-interface.h
+        cp ${nvidia-vgpu-kvm-src}/kernel/common/inc/nv-vgpu-vfio-interface.h kernel/common/inc/nv-vgpu-vfio-interface.h
         cp ${nvidia-vgpu-kvm-src}/kernel/nvidia/nv-vgpu-vfio-interface.c kernel/nvidia/nv-vgpu-vfio-interface.c
         echo "NVIDIA_SOURCES += nvidia/nv-vgpu-vfio-interface.c" >> kernel/nvidia/nvidia-sources.Kbuild
         cp -r ${nvidia-vgpu-kvm-src}/kernel/nvidia-vgpu-vfio kernel/nvidia-vgpu-vfio
